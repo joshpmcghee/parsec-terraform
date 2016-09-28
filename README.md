@@ -1,6 +1,8 @@
 # parsec-terraform
 A simple Terraform template to build a Parsec Server inside a VPC in AWS.
 
+**The user_data isn't quite delivering the authtoken correctly at this time, you may have to insert the file yourself.**
+
 Only tested on OSX.
 
 ## How to use this
