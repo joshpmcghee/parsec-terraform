@@ -55,6 +55,13 @@ resource "aws_security_group" "parsec" {
   ingress {
       from_port = 8000
       to_port = 8004
+      protocol = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+      from_port = 8000
+      to_port = 8004
       protocol = "udp"
       cidr_blocks = ["0.0.0.0/0"]
   }
