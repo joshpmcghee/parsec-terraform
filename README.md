@@ -9,6 +9,7 @@ Only tested on OSX.
 3. Create a `~/.tfvars` file that looks like the template below with your vars substituted.
 4. Run `terraform plan -var-file=~/.tfvars` in the root of the repo to check that Terraform can and will build what you want it to.
 5. Run `terraform apply -var-file=~/.tfvars` to build your server.
+6. Run `terraform destroy -var-file=~/.tfvars` to clean up when you're done.
 
 ## .tfvars
 ```
