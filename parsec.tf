@@ -82,7 +82,8 @@ data "template_file" "user_data" {
     }
 }
 
-resource "aws_instance" "parsec" {
+resource "aws_spot_instance_request" "parsec" {
+    spot_price = "0.7"
     ami = "${data.aws_ami.parsec.id}"
     subnet_id = "${var.aws_subnet}"
     instance_type = "g2.2xlarge"
@@ -93,10 +94,16 @@ resource "aws_instance" "parsec" {
 
     root_block_device {
       volume_size = 30
+    }
+
+    ebs_block_device {
+      volume_size = 100
       volume_type = "gp2"
+      device_name = "xvdg"
     }
 
     user_data = "${data.template_file.user_data.rendered}"
+
     vpc_security_group_ids = ["${aws_security_group.parsec.id}"]
     associate_public_ip_address = true
 }
