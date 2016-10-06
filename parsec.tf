@@ -18,6 +18,7 @@ variable "aws_subnet" {
 
 variable "aws_spot_price" {
   type = "string"
+  default = "0.7"
 }
 
 # Template
@@ -91,7 +92,7 @@ data "template_file" "user_data" {
 }
 
 resource "aws_spot_instance_request" "parsec" {
-    spot_price = "${coalesce(var.aws_spot_price, "0.7")}"
+    spot_price = "${var.aws_spot_price}"
     ami = "${data.aws_ami.parsec.id}"
     subnet_id = "${var.aws_subnet}"
     instance_type = "g2.2xlarge"
