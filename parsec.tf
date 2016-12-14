@@ -4,14 +4,6 @@ variable "parsec_authcode" {
   type = "string"
 }
 
-variable "aws_access_key" {
-  type = "string"
-}
-
-variable "aws_secret" {
-  type = "string"
-}
-
 variable "aws_region" {
   type = "string"
 }
@@ -28,15 +20,13 @@ variable "aws_subnet" {
 
 provider "aws" {
   region = "${var.aws_region}"
-  access_key = "${var.aws_access_key}"
-  secret_key = "${var.aws_secret}"
 }
 
 data "aws_ami" "parsec" {
   most_recent = true
   filter {
     name = "name"
-    values = ["parsec-ws2012-1"]
+    values = ["ParsecRun-1"]
   }
 }
 
@@ -49,6 +39,20 @@ resource "aws_security_group" "parsec" {
       from_port = 8000
       to_port = 8004
       protocol = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+      from_port = 5900
+      to_port = 5900
+      protocol = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+      from_port = 5900
+      to_port = 5900
+      protocol = "udp"
       cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -93,7 +97,7 @@ resource "aws_spot_instance_request" "parsec" {
     }
 
     root_block_device {
-      volume_size = 30
+      volume_size = 50
     }
 
     ebs_block_device {
@@ -106,4 +110,16 @@ resource "aws_spot_instance_request" "parsec" {
 
     vpc_security_group_ids = ["${aws_security_group.parsec.id}"]
     associate_public_ip_address = true
+}
+
+output "aws_region" {
+  value = "${var.aws_region}"
+}
+
+output "aws_subnet" {
+  value = "${var.aws_subnet}"
+}
+
+output "aws_vpc" {
+  value = "${var.aws_vpc}"
 }
