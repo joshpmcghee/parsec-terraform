@@ -26,7 +26,7 @@ data "aws_ami" "parsec" {
   most_recent = true
   filter {
     name = "name"
-    values = ["ParsecRun-1"]
+    values = ["ParsecRun-3"]
   }
 }
 
