@@ -1,5 +1,5 @@
 # parsec-terraform
-A simple Terraform template and automation tool to build a Parsec Server inside a VPC in AWS.
+A simple Terraform template and automation tool to build a Parsec Server inside a VPC in AWS in the least expensive availability zone.
 
 This uses a modified Parsec AMI with Steam pre-installed for quick setup. Default password: @w3some.
 
