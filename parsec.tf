@@ -26,7 +26,7 @@ data "aws_ami" "parsec" {
   most_recent = true
   filter {
     name = "name"
-    values = ["ParsecRun-3"]
+    values = ["parsec-ws2016-6"]
   }
 }
 
@@ -97,7 +97,7 @@ resource "aws_spot_instance_request" "parsec" {
     }
 
     root_block_device {
-      volume_size = 50
+      volume_size = 30
     }
 
     ebs_block_device {
