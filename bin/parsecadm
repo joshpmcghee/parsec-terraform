@@ -4,8 +4,6 @@ function detect_cheapest {
 
 echo "Detecting the least expensive AZ in your region."
 
-vpc_id=$(aws --region $aws_region ec2 describe-vpcs | jq '.Vpcs[] | .VpcId + "#\(.IsDefault)"' | sed -e 's/"//g' | grep '#true' | cut -d '#' -f 1)
-
 reservation_data=$(aws --region $aws_region ec2 describe-spot-price-history --instance-types g2.2xlarge --start-time="$(date -v-1d)" --product-description=Windows | jq '.SpotPriceHistory[] | .Timestamp + "#" + .SpotPrice + "#" + .AvailabilityZone' | sed -e 's/"//g' | sort | tail -n 10)
 azs=$(aws --region $aws_region ec2 describe-availability-zones | jq '.AvailabilityZones[] | .ZoneName' | sed -e 's/"//g')
 
@@ -22,8 +20,6 @@ for data in $reservation_data; do
     fi
   fi
 done
-
-subnet_id=$(aws --region $aws_region ec2 describe-subnets | jq ' .Subnets[] |  .SubnetId + "#" + .AvailabilityZone' | sed -e 's/"//g' | grep "$cheapest_az" | cut -d '#' -f 1)
 
 echo "Detected $cheapest_az as the least expensive availability zone in your region for g2.2xlarge spots at \$$cheapest/hr."
 }
@@ -43,8 +39,6 @@ plan)
   aws_region="$2"
   detect_cheapest
 
-  TF_VAR_aws_vpc=$vpc_id \
-  TF_VAR_aws_subnet=$subnet_id \
   TF_VAR_aws_region=$aws_region \
   TF_VAR_parsec_authcode=$3 \
   terraform plan
@@ -56,15 +50,11 @@ apply)
 
   detect_cheapest
 
-  TF_VAR_aws_vpc=$vpc_id \
-  TF_VAR_aws_subnet=$subnet_id \
   TF_VAR_aws_region=$aws_region \
   TF_VAR_parsec_authcode=$3 \
   terraform apply
   ;;
 destroy)
-  TF_VAR_aws_vpc="$(terraform output aws_vpc)" \
-  TF_VAR_aws_subnet="$(terraform output aws_subnet)" \
   TF_VAR_aws_region="$(terraform output aws_region)" \
   TF_VAR_parsec_authcode="" \
   terraform destroy -force
