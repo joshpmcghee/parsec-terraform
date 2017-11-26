@@ -40,6 +40,7 @@ plan)
   detect_cheapest
 
   TF_VAR_aws_region=$aws_region \
+  TF_VAR_aws_cheapest_az=$cheapest_az \
   TF_VAR_parsec_authcode=$3 \
   terraform plan
 
@@ -51,6 +52,7 @@ apply)
   detect_cheapest
 
   TF_VAR_aws_region=$aws_region \
+  TF_VAR_aws_cheapest_az=$cheapest_az \
   TF_VAR_parsec_authcode=$3 \
   terraform apply
   ;;

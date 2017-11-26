@@ -4,6 +4,11 @@ variable "parsec_authcode" {
   type = "string"
 }
 
+variable "aws_cheapest_az" {
+  type    = "string"
+  default = ""
+}
+
 variable "aws_region" {
   type = "string"
 }
@@ -34,7 +39,7 @@ resource "aws_vpc" "vpc_parsec" {
 }
 
 resource "aws_subnet" "vpc_parsec_public_subnet" {
-  availability_zone       = "us-east-1a"
+  availability_zone       = "${var.aws_cheapest_az}"
   cidr_block              = "10.0.0.0/24"
   map_public_ip_on_launch = true
   vpc_id                  = "${aws_vpc.vpc_parsec.id}"
