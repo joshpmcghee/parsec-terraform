@@ -2,11 +2,17 @@
 
 function detect_cheapest {
 
+if [ "$aws_region" == "" ]; then
+  echo "AWS region is not defined. Please specify one. For example us-west-1"
+  exit 1
+fi
 echo "Detecting the least expensive AZ in your region."
 
 vpc_id=$(aws --region $aws_region ec2 describe-vpcs | jq '.Vpcs[] | .VpcId + "#\(.IsDefault)"' | sed -e 's/"//g' | grep '#true' | cut -d '#' -f 1)
 
-reservation_data=$(aws --region $aws_region ec2 describe-spot-price-history --instance-types g2.2xlarge --start-time="$(date -v-1d)" --product-description=Windows | jq '.SpotPriceHistory[] | .Timestamp + "#" + .SpotPrice + "#" + .AvailabilityZone' | sed -e 's/"//g' | sort | tail -n 10)
+echo "vpc_id=$vpc_id"
+#reservation_data=$(aws --region $aws_region ec2 describe-spot-price-history --instance-types g2.2xlarge --start-time="$(date -v-1d)" --product-description=Windows | jq '.SpotPriceHistory[] | .Timestamp + "#" + .SpotPrice + "#" + .AvailabilityZone' | sed -e 's/"//g' | sort | tail -n 10)
+reservation_data=$(aws --region $aws_region ec2 describe-spot-price-history --instance-types g2.2xlarge --start-time="$(date +%Y-%m-%dT%H:%M:%S)" --product-description=Windows | jq '.SpotPriceHistory[] | .Timestamp + "#" + .SpotPrice + "#" + .AvailabilityZone' | sed -e 's/"//g' | sort | tail -n 10)
 azs=$(aws --region $aws_region ec2 describe-availability-zones | jq '.AvailabilityZones[] | .ZoneName' | sed -e 's/"//g')
 
 cheapest="10000000.0"
@@ -24,6 +30,7 @@ for data in $reservation_data; do
 done
 
 subnet_id=$(aws --region $aws_region ec2 describe-subnets | jq ' .Subnets[] |  .SubnetId + "#" + .AvailabilityZone' | sed -e 's/"//g' | grep "$cheapest_az" | cut -d '#' -f 1)
+#echo "subnet_id=$subnet_id"
 
 echo "Detected $cheapest_az as the least expensive availability zone in your region for g2.2xlarge spots at \$$cheapest/hr."
 }
@@ -38,7 +45,17 @@ if ! jq --version &> /dev/null; then
   exit 1
 fi
 
+if ! bc --version &> /dev/null; then
+  echo 'You must install bc to use Parsec ADM(yum install bc) '
+  exit 1
+fi
+
+terraform init
 case $1 in
+detect_cheapest)
+  aws_region="$2"
+  detect_cheapest
+  ;;
 plan)
   aws_region="$2"
   detect_cheapest
@@ -72,6 +89,8 @@ destroy)
 help)
     cat <<EOF
 Parsec ADM - Automated AWS deployments for Parsec(Unofficial) that automatically find the lowest price in your region.
+
+  detect_cheapest 
 
   plan <aws region> <parsec token>
     Runs a "terraform plan" with the lowest region zone to show you what you'll build.
