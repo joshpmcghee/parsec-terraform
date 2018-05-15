@@ -26,7 +26,8 @@ data "aws_ami" "parsec" {
   most_recent = true
   filter {
     name = "name"
-    values = ["ParsecRun-3"]
+#    values = ["ParsecRun-3"]
+    values = ["parsec-g2-ws2016-*"]
   }
 }
 
