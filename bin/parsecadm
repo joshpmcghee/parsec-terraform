@@ -30,7 +30,7 @@ for data in $reservation_data; do
 done
 
 subnet_id=$(aws --region $aws_region ec2 describe-subnets | jq ' .Subnets[] |  .SubnetId + "#" + .AvailabilityZone' | sed -e 's/"//g' | grep "$cheapest_az" | cut -d '#' -f 1)
-echo "subnet_id=$subnet_id"
+#echo "subnet_id=$subnet_id"
 
 echo "Detected $cheapest_az as the least expensive availability zone in your region for g2.2xlarge spots at \$$cheapest/hr."
 }
